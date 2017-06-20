@@ -7,8 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.provider.CallLog;
-
-import com.plagh.ggxx.helloworld.util.PermissionsChecker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +19,8 @@ import java.util.List;
  */
 
 public class CallRecord {
+
+    private static final int MAX_RECORD_NUM = 500;
 
     private String name;
     private String number;
@@ -84,7 +85,7 @@ public class CallRecord {
         }
 
         // 3.通过Cursor获得数据
-        while (cursor.moveToNext()) {
+        while (cursor.moveToNext() && list.size() < MAX_RECORD_NUM) {
             String name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
             String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
             long dateLong = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DATE));
@@ -137,7 +138,8 @@ public class CallRecord {
          */
         Cursor cursor;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            if (context.checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
+                    && context.checkSelfPermission(Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
                 cursor = resolver.query(CallLog.Calls.CONTENT_URI, // 查询通话记录的URI
                         new String[]{CallLog.Calls.CACHED_NAME// 通话记录的联系人
                                 , CallLog.Calls.NUMBER// 通话记录的电话号码
@@ -147,6 +149,8 @@ public class CallRecord {
                         , null, null, CallLog.Calls.DEFAULT_SORT_ORDER// 按照时间逆序排列，最近打的最先显示
                 );
             } else {
+                Toast toast = Toast.makeText(context, "无权限", Toast.LENGTH_SHORT);
+                toast.show();
                 return null;
             }
         } else {

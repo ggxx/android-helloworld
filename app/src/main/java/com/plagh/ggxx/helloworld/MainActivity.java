@@ -1,5 +1,7 @@
 package com.plagh.ggxx.helloworld;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import com.plagh.ggxx.helloworld.call.CallRecord;
 import com.plagh.ggxx.helloworld.dummy.DummyContent;
+import com.plagh.ggxx.helloworld.util.PermissionHelper;
 
 public class MainActivity extends AppCompatActivity implements CallItemFragment.OnListFragmentInteractionListener, CallRecordFragment.OnListFragmentInteractionListener {
 
@@ -24,6 +27,14 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
     private final String TAG_CALL = "TAG_CALL";
     private final String TAG_ABOUT = "TAG_ABOUT";
     private final String TAG_KEY = "TAG_KEY";
+
+    //返回值
+    private static final int CALL_RESULT_CODE = 12;
+    //权限名称
+    private static final String CALL_PERMISSION = Manifest.permission.CALL_PHONE;
+
+    //权限检测类
+    private PermissionHelper mPermissionHelper;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,7 +73,45 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
                 addOrShowFragment(tag);
             }
         }
+
+        PermissionHelper.getPermissions(this);
     }
+
+    /*
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //判断权限授权状态
+        boolean b = mPermissionHelper.checkPermission(CALL_PERMISSION);
+
+        //如果没有获取到权限,则尝试获取权限
+        if (!b) {
+            mPermissionHelper.permissionsCheck(CALL_PERMISSION, CALL_RESULT_CODE);
+        } else {
+
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case CALL_RESULT_CODE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+
+                } else {
+                    //如果请求失败
+                    //mPermissionHelper.startAppSettings();
+                }
+                break;
+        }
+    }
+    */
 
     @Override
     protected void onStop() {

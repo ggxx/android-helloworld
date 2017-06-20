@@ -38,6 +38,7 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
         holder.mNameView.setText(mValues.get(position).getName());
         holder.mNumberView.setText(mValues.get(position).getNumber());
         holder.mDateView.setText(mValues.get(position).getDate());
+        holder.mTypeView.setText(mValues.get(position).getType());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +62,7 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
         public final TextView mNameView;
         public final TextView mNumberView;
         public final TextView mDateView;
+        public final TextView mTypeView;
         public CallRecord mItem;
 
         public ViewHolder(View view) {
@@ -69,6 +71,7 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
             mNameView = (TextView) view.findViewById(R.id.callrecord_name);
             mNumberView = (TextView) view.findViewById(R.id.callrecord_number);
             mDateView = (TextView) view.findViewById(R.id.callrecord_date);
+            mTypeView = (TextView) view.findViewById(R.id.callrecord_type);
         }
 
         @Override
