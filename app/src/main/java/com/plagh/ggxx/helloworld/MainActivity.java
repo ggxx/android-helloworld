@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -163,6 +164,10 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
     public void onListFragmentInteraction(CallRecord item) {
         //Toast toast = Toast.makeText(this, item.getName(), Toast.LENGTH_SHORT);
         //toast.show();
+
+        Snackbar.make(this.getCurrentFocus(), item.getName(), Snackbar.LENGTH_LONG)
+                .setAction("Action", null)
+                .show();
     }
 
     @Override
