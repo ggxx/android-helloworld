@@ -1,5 +1,6 @@
 package com.plagh.ggxx.helloworld;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,14 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
         holder.mNameView.setText(mValues.get(position).getName());
         holder.mNumberView.setText(mValues.get(position).getNumber());
         holder.mDateView.setText(mValues.get(position).getDate());
-        holder.mTypeView.setText(mValues.get(position).getType());
+        holder.mTypeView.setText(mValues.get(position).getCallType());
+        holder.mDurationView.setText(mValues.get(position).getDurationString());
+
+        if (mValues.get(position).getCallType() == "未接") {
+            holder.mTypeView.setTextColor(holder.mView.getResources().getColor(R.color.darkred));
+        } else {
+            holder.mTypeView.setTextColor(holder.mView.getResources().getColor(R.color.darkblue));
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +71,7 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
         public final TextView mNumberView;
         public final TextView mDateView;
         public final TextView mTypeView;
+        public final TextView mDurationView;
         public CallRecord mItem;
 
         public ViewHolder(View view) {
@@ -71,7 +80,8 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
             mNameView = (TextView) view.findViewById(R.id.callrecord_name);
             mNumberView = (TextView) view.findViewById(R.id.callrecord_number);
             mDateView = (TextView) view.findViewById(R.id.callrecord_date);
-            mTypeView = (TextView) view.findViewById(R.id.callrecord_type);
+            mTypeView = (TextView) view.findViewById(R.id.callrecord_calltype);
+            mDurationView = (TextView) view.findViewById(R.id.callrecord_duration);
         }
 
         @Override

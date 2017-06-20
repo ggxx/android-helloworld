@@ -2,6 +2,7 @@ package com.plagh.ggxx.helloworld;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -18,15 +19,17 @@ import com.plagh.ggxx.helloworld.call.CallRecord;
 import com.plagh.ggxx.helloworld.dummy.DummyContent;
 import com.plagh.ggxx.helloworld.util.PermissionHelper;
 
-public class MainActivity extends AppCompatActivity implements CallItemFragment.OnListFragmentInteractionListener, CallRecordFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity
+        implements CallItemFragment.OnListFragmentInteractionListener,
+        CallRecordFragment.OnListFragmentInteractionListener,
+        CameraFragment.OnFragmentInteractionListener {
 
-    private TextView mTextMessage;
     private FragmentManager fm;
     private Fragment currentFragment;
     private String currentTag = "";
     private final String TAG_DUMMY = "TAG_DUMMY";
     private final String TAG_CALL = "TAG_CALL";
-    private final String TAG_ABOUT = "TAG_ABOUT";
+    private final String TAG_CAMERA = "TAG_CAMERA";
     private final String TAG_KEY = "TAG_KEY";
 
     //返回值
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
                     addOrShowFragment(TAG_CALL);
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                    addOrShowFragment(TAG_CAMERA);
                     return true;
             }
             return false;
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
                 currentFragment = fm.findFragmentByTag(tag);
                 addOrShowFragment(tag);
             }
+        } else {
+            addOrShowFragment(TAG_DUMMY);
         }
 
         PermissionHelper.getPermissions(this);
@@ -147,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
                 return new CallItemFragment();
             case TAG_CALL:
                 return new CallRecordFragment();
-            case TAG_ABOUT:
-                return null;
+            case TAG_CAMERA:
+                return new CameraFragment();
             default:
                 return null;
         }
@@ -171,6 +175,11 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
     }
 
     @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
     public void onAttachFragment(Fragment fragment) {
         // TODO Auto-generated method stub
         super.onAttachFragment(fragment);
@@ -186,4 +195,6 @@ public class MainActivity extends AppCompatActivity implements CallItemFragment.
     protected void onRestoreInstanceState(Bundle outState) {
         super.onRestoreInstanceState(outState);
     }
+
+
 }

@@ -25,7 +25,7 @@ public class CallRecord {
     private String name;
     private String number;
     private String date;
-    private String type;
+    private String callType;
     private int duration;
 
     public String getNumber() {
@@ -44,12 +44,12 @@ public class CallRecord {
         this.date = date;
     }
 
-    public String getType() {
-        return type;
+    public String getCallType() {
+        return callType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCallType(String callType) {
+        this.callType = callType;
     }
 
     public String getName() {
@@ -62,6 +62,10 @@ public class CallRecord {
 
     public int getDuration() {
         return duration;
+    }
+
+    public String getDurationString() {
+        return String.valueOf(duration) + "秒";
     }
 
     public void setDuration(int duration) {
@@ -89,7 +93,7 @@ public class CallRecord {
             String name = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
             String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
             long dateLong = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DATE));
-            String date = new SimpleDateFormat("MM-dd HH:mm:ss").format(new Date(dateLong));
+            String date = new SimpleDateFormat("MM-dd HH:mm").format(new Date(dateLong));
             int duration = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.DURATION));
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             String typeString = "";
@@ -103,9 +107,6 @@ public class CallRecord {
                 case CallLog.Calls.MISSED_TYPE:
                     typeString = "未接";
                     break;
-                case CallLog.Calls.REJECTED_TYPE:
-                    typeString = "拒接";
-                    break;
                 default:
                     typeString = "未知";
                     break;
@@ -114,7 +115,7 @@ public class CallRecord {
             callRecord.setName(name == null ? "未知联系人" : name);
             callRecord.setNumber(number);
             callRecord.setDate(date);
-            callRecord.setType(typeString);
+            callRecord.setCallType(typeString);
             callRecord.setDuration(duration);
             list.add(callRecord);
         }
