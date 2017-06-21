@@ -45,7 +45,7 @@ public class CallRecordRecyclerViewAdapter extends RecyclerView.Adapter<CallReco
         if (mValues.get(position).getCallType() == "未接") {
             holder.mTypeView.setTextColor(holder.mView.getResources().getColor(R.color.darkred));
         } else {
-            holder.mTypeView.setTextColor(holder.mView.getResources().getColor(R.color.darkblue));
+            holder.mTypeView.setTextColor(holder.mView.getResources().getColor(R.color.blue));
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

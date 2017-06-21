@@ -1,7 +1,6 @@
 package com.plagh.ggxx.helloworld;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,22 +11,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.plagh.ggxx.helloworld.call.CallRecord;
-import com.plagh.ggxx.helloworld.dummy.DummyContent;
 import com.plagh.ggxx.helloworld.util.PermissionHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements CallItemFragment.OnListFragmentInteractionListener,
+        implements HomeFragment.OnFragmentInteractionListener,
         CallRecordFragment.OnListFragmentInteractionListener,
         CameraFragment.OnFragmentInteractionListener {
 
     private FragmentManager fm;
     private Fragment currentFragment;
     private String currentTag = "";
-    private final String TAG_DUMMY = "TAG_DUMMY";
+    private final String TAG_HOME = "TAG_HOME";
     private final String TAG_CALL = "TAG_CALL";
     private final String TAG_CAMERA = "TAG_CAMERA";
     private final String TAG_KEY = "TAG_KEY";
@@ -47,7 +43,7 @@ public class MainActivity extends AppCompatActivity
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    addOrShowFragment(TAG_DUMMY);
+                    addOrShowFragment(TAG_HOME);
                     return true;
                 case R.id.navigation_dashboard:
                     addOrShowFragment(TAG_CALL);
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity
                 addOrShowFragment(tag);
             }
         } else {
-            addOrShowFragment(TAG_DUMMY);
+            addOrShowFragment(TAG_HOME);
         }
 
         PermissionHelper.getPermissions(this);
@@ -147,8 +143,8 @@ public class MainActivity extends AppCompatActivity
 
     private Fragment createFragment(String tag) {
         switch (tag) {
-            case TAG_DUMMY:
-                return new CallItemFragment();
+            case TAG_HOME:
+                return HomeFragment.newInstance("", "");
             case TAG_CALL:
                 return new CallRecordFragment();
             case TAG_CAMERA:
@@ -159,7 +155,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onFragmentInteraction(Uri uri) {
         //Toast toast = Toast.makeText(this, item.content, Toast.LENGTH_SHORT);
         //toast.show();
     }
@@ -172,11 +168,6 @@ public class MainActivity extends AppCompatActivity
         Snackbar.make(this.getCurrentFocus(), item.getName(), Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
                 .show();
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override

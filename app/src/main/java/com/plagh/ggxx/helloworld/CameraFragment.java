@@ -1,72 +1,60 @@
 package com.plagh.ggxx.helloworld;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.plagh.ggxx.helloworld.util.CameraUtil;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link CameraFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link CameraFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
-public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private SurfaceView surfaceView; //预览摄像头
-    private SurfaceHolder surfaceHolder;
-    private Camera camera; //摄像头
-
+public class CameraFragment extends Fragment
+        implements TextureView.SurfaceTextureListener,
+         {
+    private Camera mCamera;
+    private TextureView mTextureView;
+    private GLSurfaceView surfaceView;
 
     private OnFragmentInteractionListener mListener;
 
     public CameraFragment() {
         // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CameraFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CameraFragment newInstance(String param1, String param2) {
-        CameraFragment fragment = new CameraFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -74,10 +62,10 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
-        surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
-        surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(this);
 
+        mTextureView = view.findViewById(R.id.camView); //new TextureView(this.getActivity());
+        mTextureView.setSurfaceTextureListener(this);
+        //setContentView(mTextureView);
         return view;
     }
 
@@ -91,12 +79,6 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -106,63 +88,65 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
         try {
-            camera = Camera.open();
-            camera.setPreviewDisplay(surfaceHolder);
-            if (!isScreenChange()) {
-                camera.setDisplayOrientation(90);
-            } else {
-                camera.setDisplayOrientation(0);
-            }
-        } catch (Exception e) {
-            if (null != camera) {
-                camera.release();
-                camera = null;
-            }
-            e.printStackTrace();
-            Toast.makeText(this.getActivity(), "启动摄像头失败,请开启摄像头权限", Toast.LENGTH_SHORT).show();
+            mTextureView.setAlpha(1.0f);
+            mTextureView.setRotation(90.0f);
+            mCamera = Camera.open();
+            mCamera.setPreviewTexture(surfaceTexture);
+            initCamera(mCamera);
+            //实现自动对焦
+            mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success, Camera camera) {
+                    if (success) {
+                        initCamera(camera);//实现相机的参数初始化
+                        camera.cancelAutoFocus();//只有加上了这一句，才会自动对焦。
+                    }
+                }
+            });
+            mCamera.startPreview();
+        } catch (IOException ioe) {
+            // Something bad happened
         }
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        camera.startPreview();
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        if (null != camera) {
-            camera.stopPreview();
-            camera.release();
-            camera = null;
-        }
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+        mCamera.stopPreview();
+        mCamera.release();
+        return true;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
+    }
+
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
-    public boolean isScreenChange() {
-        Configuration mConfiguration = this.getResources().getConfiguration(); //获取设置的配置信息
-        int ori = mConfiguration.orientation; //获取屏幕方向
-
-        if (ori == mConfiguration.ORIENTATION_LANDSCAPE) {
-            return true; //横屏
-        } else if (ori == mConfiguration.ORIENTATION_PORTRAIT) {
-            return false; //竖屏
-        }
-        return false;
+    public void initCamera(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setPictureFormat(PixelFormat.JPEG);
+        //parameters.setPictureSize(surfaceView.getWidth(), surfaceView.getHeight());  // 部分定制手机，无法正常识别该方法。
+        //parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);//1连续对焦
+        //setDispaly(parameters,camera);
+        camera.setParameters(parameters);
+        camera.startPreview();
+        camera.cancelAutoFocus();// 2如果要实现连续的自动对焦，这一句必须加上
     }
 }
