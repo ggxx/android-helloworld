@@ -6,9 +6,9 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <TextureView
+    <com.plagh.ggxx.helloworld.MyGLSurfaceView
         android:id="@+id/camView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    
+
 </FrameLayout>

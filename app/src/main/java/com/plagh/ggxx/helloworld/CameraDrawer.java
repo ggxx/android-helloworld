@@ -93,7 +93,7 @@ public class CameraDrawer {
         GLES20.glLinkProgram(mProgram);                  // creates OpenGL ES program executables
     }
 
-    public void drawSelf(float[] mtx) {
+    public void draw(float[] mtx) {
         GLES20.glUseProgram(mProgram);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -111,7 +111,12 @@ public class CameraDrawer {
         mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
 
+        textureVerticesBuffer.clear();
+        textureVerticesBuffer.put(transformTextureCoordinates(textureVertices, mtx));
+        textureVerticesBuffer.position(0);
+
         GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, textureVerticesBuffer);
+
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
         // Disable vertex array

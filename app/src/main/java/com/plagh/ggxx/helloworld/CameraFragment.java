@@ -38,12 +38,10 @@ import java.util.List;
  * {@link CameraFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class CameraFragment extends Fragment
-        implements TextureView.SurfaceTextureListener,
-         {
+public class CameraFragment extends Fragment {
     private Camera mCamera;
-    private TextureView mTextureView;
-    private GLSurfaceView surfaceView;
+    private MyGLSurfaceView surfaceView;
+    private TextureRenderer renderer;
 
     private OnFragmentInteractionListener mListener;
 
@@ -63,8 +61,8 @@ public class CameraFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
 
-        mTextureView = view.findViewById(R.id.camView); //new TextureView(this.getActivity());
-        mTextureView.setSurfaceTextureListener(this);
+        surfaceView = view.findViewById(R.id.camView); //new TextureView(this.getActivity());
+        //surfaceView.setSurfaceTextureListener(this);
         //setContentView(mTextureView);
         return view;
     }
@@ -88,49 +86,17 @@ public class CameraFragment extends Fragment
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
-        try {
-            mTextureView.setAlpha(1.0f);
-            mTextureView.setRotation(90.0f);
-            mCamera = Camera.open();
-            mCamera.setPreviewTexture(surfaceTexture);
-            initCamera(mCamera);
-            //实现自动对焦
-            mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    if (success) {
-                        initCamera(camera);//实现相机的参数初始化
-                        camera.cancelAutoFocus();//只有加上了这一句，才会自动对焦。
-                    }
-                }
-            });
-            mCamera.startPreview();
-        } catch (IOException ioe) {
-            // Something bad happened
-        }
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        surfaceView.bringToFront();
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
-
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        mCamera.stopPreview();
-        mCamera.release();
-        return true;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-
-    }
-
-    @Override
-    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        surfaceView.onPause();
     }
 
     public interface OnFragmentInteractionListener {
